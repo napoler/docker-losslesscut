@@ -86,6 +86,57 @@ services:
 
 文件从宿主机挂载到容器的 `/storage` 目录下，可以直接在 LosslessCut 中访问和编辑。
 
+## 推荐工具
+
+### HandBrake - 视频转码工具
+
+[HandBrake](https://handbrake.fr/) 是一个开源的视频转码工具，配合 LosslessCut 使用可以实现完整的工作流：
+
+**工作流**: LosslessCut 无损剪辑 → HandBrake 转码压缩
+
+```shell
+# 部署 HandBrake Docker
+docker run -d --name handbrake \
+    -p 5801:5800 \
+    -v ~/Videos:/storage:rw \
+    -v ~/HandBrake/watch:/watch:rw \
+    -v ~/HandBrake/output:/output:rw \
+    jlesage/handbrake
+```
+
+**自动化转码**: 将 LosslessCut 剪辑输出的文件放入 `/watch` 目录，HandBrake 会自动转码并输出到 `/output` 目录。
+
+### Docker Compose 联合部署
+
+```yaml
+version: '3'
+services:
+  losslesscut:
+    image: ghcr.io/napoler/losslesscut:latest
+    container_name: losslesscut
+    ports:
+      - "5800:5800"
+    volumes:
+      - ./config:/config
+      - ~/Videos:/storage
+    restart: unless-stopped
+
+  handbrake:
+    image: jlesage/handbrake:latest
+    container_name: handbrake
+    ports:
+      - "5801:5800"
+    volumes:
+      - ~/Videos:/storage
+      - ~/HandBrake/watch:/watch
+      - ~/HandBrake/output:/output
+    restart: unless-stopped
+```
+
+**访问地址**:
+- LosslessCut: `http://localhost:5800`
+- HandBrake: `http://localhost:5801`
+
 ## Usage
 
 ```shell
