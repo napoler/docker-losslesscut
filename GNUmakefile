@@ -5,9 +5,9 @@
 # $ make buildx - Build multiplatform images
 # $ make push   - Push multiplatform images to the registry
 
-IMAGE_NAME=outlyernet/losslesscut
+IMAGE_NAME=napoler/losslesscut
 TAG:=latest
-REGISTRY:=docker.io
+REGISTRY:=ghcr.io
 # Additional tags (passed verbatim to docker build), separated by spaces
 ADD_TAGS:=
 

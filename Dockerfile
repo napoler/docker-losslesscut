@@ -123,7 +123,8 @@ RUN LC_ALL="C.UTF-8" add-pkg \
 # some manual additions, mostly from  v3.47.1
 RUN LC_ALL="C.UTF-8" add-pkg \
       libgl1 \
-      libx11-xcb1
+      libx11-xcb1 \
+      librsvg2-bin
 #      #libxss1 \
 #      #libxtst6
 
@@ -156,12 +157,12 @@ EXPOSE 5800/tcp 5900/tcp
 # Note the org.label-schema.* labels are inherited from the base image
 # TODO: Find out if it's worth overwriting them
 LABEL \
-      maintainer="Toni Corvera <outlyer@gmail.com>" \
+      maintainer="napoler" \
       org.opencontainers.image.title="Dockerized LosslessCut" \
       org.opencontainers.image.description="Docker container to make LosslessCut usable via web browser and VNC" \
       org.opencontainers.image.version="${image_revision}}" \
-      org.opencontainers.image.url="https://hub.docker.com/repository/docker/outlyernet/losslesscut" \
-      org.opencontainers.image.source="https://github.com/outlyer-net/docker-losslesscut" \
+      org.opencontainers.image.url="https://github.com/napoler/docker-losslesscut" \
+      org.opencontainers.image.source="https://github.com/napoler/docker-losslesscut" \
       org.opencontainers.image.licenses="GPL-2.0"
 
 # Define HOME to ease usage of the file chooser

@@ -3,16 +3,14 @@
 
 [LosslessCut]: https://github.com/mifi/lossless-cut
 
-[![Build on push](https://github.com/outlyer-net/docker-losslesscut/actions/workflows/ci.yaml/badge.svg)](https://github.com/outlyer-net/docker-losslesscut/actions/workflows/ci.yaml)
-[![Deploy image to registry](https://github.com/outlyer-net/docker-losslesscut/actions/workflows/build-and-deploy.yaml/badge.svg)](https://github.com/outlyer-net/docker-losslesscut/actions/workflows/build-and-deploy.yaml)
-
-![Docker Image Version (latest semver)](https://img.shields.io/docker/v/outlyernet/losslesscut?sort=semver)
-[![Docker Image Size](https://img.shields.io/docker/image-size/outlyernet/losslesscut/latest)](https://hub.docker.com/r/outlyernet/losslesscut/tags)
-[![GitHub](https://img.shields.io/github/license/outlyer-net/docker-losslesscut)](https://github.com/outlyer-net/docker-losslesscut/blob/master/LICENSE)
+[![GitHub](https://img.shields.io/github/license/napoler/docker-losslesscut)](https://github.com/napoler/docker-losslesscut/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/mifi/lossless-cut?label=LosslessCut)](https://github.com/mifi/lossless-cut/releases)
 
 This is a Docker container for [LosslessCut].
 
 The GUI of the application is accessed through a modern web browser (no installation or configuration needed on the client side) or via any VNC client.
+
+> **镜像地址**: `ghcr.io/napoler/losslesscut`
 
 ---
 
@@ -44,27 +42,49 @@ The swiss army knife of lossless video/audio editing
 
 ## Quick Start
 
-Launch the LosslessCut docker container with the following command:
+### 一键部署
+
 ```shell
 docker run --rm -d \
     --name=losslesscut \
     -p 5800:5800 \
-    -v /path/to/data/losslesscut:/config:rw \
+    -v ~/.config/losslesscut:/config:rw \
     -v $HOME:/storage:rw \
-    outlyernet/losslesscut
+    ghcr.io/napoler/losslesscut
 ```
 
-Where:
-  - `/path/to/data/losslesscut`: Where the application stores any persistent data.
-  - `$HOME`: This location contains files from your host that need to be accessible to the application.
+### Docker Compose
 
-Browse to `http://your-host-ip:5800` to access the LosslessCut GUI.
-Files from the host appear under the `/storage` folder in the container.
+```yaml
+version: '3'
+services:
+  losslesscut:
+    image: ghcr.io/napoler/losslesscut:latest
+    container_name: losslesscut
+    ports:
+      - "5800:5800"
+    volumes:
+      - ./config:/config
+      - ~/Videos:/storage
+    restart: unless-stopped
+```
 
-**Notes:**
-* This Docker command is given as an example and parameters should be adjusted to your needs.
-* The image is available in both Docker Hub as `outlyernet/losslesscut` and the GitHub Container Registry as `ghcr.io/outlyer-net/docker-losslesscut`
-* For additional documentation see the [base image](https://github.com/jlesage/docker-baseimage-gui).
+启动后访问 `http://localhost:5800` 即可使用 LosslessCut。
+
+### 参数说明
+
+| 参数 | 说明 |
+|------|------|
+| `-p 5800:5800` | Web GUI 端口 |
+| `-v /config` | 配置文件持久化目录 |
+| `-v /storage` | 宿主机文件访问目录（在应用中显示为 `/storage`） |
+
+### 访问方式
+
+- **Web 浏览器**: `http://<HOST IP>:5800`
+- **VNC 客户端**: `<HOST IP>:5900`
+
+文件从宿主机挂载到容器的 `/storage` 目录下，可以直接在 LosslessCut 中访问和编辑。
 
 ## Usage
 
@@ -74,7 +94,7 @@ docker run [--rm] [-d] \
     [-e <VARIABLE_NAME>=<VALUE>]... \
     [-v <HOST_DIR>:<CONTAINER_DIR>[:PERMISSIONS]]... \
     [-p <HOST_PORT>:<CONTAINER_PORT>]... \
-    outlyernet/losslesscut
+    ghcr.io/napoler/losslesscut
 ```
 | Parameter | Description |
 |-----------|-------------|
@@ -296,10 +316,10 @@ creation (e.g. `losslesscut`).
 
 ## Support or Contact
 
-Having troubles with the container or have questions?  Please
+Having troubles with the container or have questions? Please
 [create a new issue].
 
 For other great Dockerized applications by *[jlesage][jlesage]*, see https://jlesage.github.io/docker-apps.
 
 [jlesage]: https://github.com/jlesage
-[create a new issue]: https://github.com/outlyer-net/docker-losslesscut/issues
+[create a new issue]: https://github.com/napoler/docker-losslesscut/issues

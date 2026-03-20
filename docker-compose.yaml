@@ -6,7 +6,7 @@ name: losslesscut
 
 services:
   losslesscut:
-    image: outlyernet/losslesscut
+    image: ghcr.io/napoler/losslesscut:latest
     build: .
     restart: unless-stopped
     ports:
