@@ -78,7 +78,25 @@ RUN set -eux \
         ffmpeg \
         fonts-liberation \
         fonts-noto-color-emoji \
-        librsvg2-bin
+        librsvg2-bin \
+        locales \
+        fontconfig \
+        locales-all
+
+# -----------------------------------------------------------------------------
+# Configure Chinese Locale
+# -----------------------------------------------------------------------------
+
+# Generate zh_CN.UTF-8 locale for Chinese text support
+RUN sed -i '/zh_CN.UTF-8/s/^# //g' /etc/locale.gen \
+    && locale-gen
+
+# Install Chinese fonts (WenQuanYi Zen Hei for CJK)
+RUN set -eux \
+    && add-pkg \
+        fonts-wqy-zenhei \
+        fonts-wqy-microhei \
+        fonts-noto-cjk
 
 # -----------------------------------------------------------------------------
 # Copy LosslessCut Binary
@@ -105,12 +123,31 @@ RUN set -eux \
     && chmod +x /startapp.sh
 
 # -----------------------------------------------------------------------------
-# Set Application Info (using set-cont-env helper)
+# Replace all non-executable cont-env.d files with executable scripts
+# Workaround for overlayfs bug on some systems where non-executable
+# files are incorrectly detected as executable
 # -----------------------------------------------------------------------------
 
-RUN set-cont-env APP_NAME "LosslessCut"
-RUN set-cont-env APP_VERSION "${APP_VERSION}"
-RUN set-cont-env DOCKER_IMAGE_VERSION "${IMAGE_REVISION}"
+RUN set -eux \
+    && for f in APP_NAME APP_VERSION DOCKER_IMAGE_VERSION DBUS_SESSION_BUS_ADDRESS \
+        DOCKER_IMAGE_PLATFORM GTK_A11Y HOME NO_AT_BRIDGE TAKE_CONFIG_OWNERSHIP \
+        XDG_CACHE_HOME XDG_CONFIG_HOME XDG_DATA_HOME XDG_RUNTIME_DIR XDG_STATE_HOME; do \
+        rm -f /etc/cont-env.d/$f; \
+    done \
+    && printf '#!/bin/sh\necho LosslessCut' > /etc/cont-env.d/APP_NAME && chmod +x /etc/cont-env.d/APP_NAME \
+    && printf '#!/bin/sh\necho %s' "${APP_VERSION}" > /etc/cont-env.d/APP_VERSION && chmod +x /etc/cont-env.d/APP_VERSION \
+    && printf '#!/bin/sh\necho %s' "${IMAGE_REVISION}" > /etc/cont-env.d/DOCKER_IMAGE_VERSION && chmod +x /etc/cont-env.d/DOCKER_IMAGE_VERSION \
+    && printf '#!/bin/sh\necho unix:path=/tmp/dbus.base' > /etc/cont-env.d/DBUS_SESSION_BUS_ADDRESS && chmod +x /etc/cont-env.d/DBUS_SESSION_BUS_ADDRESS \
+    && printf '#!/bin/sh\necho linux/amd64' > /etc/cont-env.d/DOCKER_IMAGE_PLATFORM && chmod +x /etc/cont-env.d/DOCKER_IMAGE_PLATFORM \
+    && printf '#!/bin/sh\necho none' > /etc/cont-env.d/GTK_A11Y && chmod +x /etc/cont-env.d/GTK_A11Y \
+    && printf '#!/bin/sh\necho' > /etc/cont-env.d/HOME && chmod +x /etc/cont-env.d/HOME \
+    && printf '#!/bin/sh\necho 1' > /etc/cont-env.d/NO_AT_BRIDGE && chmod +x /etc/cont-env.d/NO_AT_BRIDGE \
+    && printf '#!/bin/sh\necho 1' > /etc/cont-env.d/TAKE_CONFIG_OWNERSHIP && chmod +x /etc/cont-env.d/TAKE_CONFIG_OWNERSHIP \
+    && printf '#!/bin/sh\necho /config/xdg/cache' > /etc/cont-env.d/XDG_CACHE_HOME && chmod +x /etc/cont-env.d/XDG_CACHE_HOME \
+    && printf '#!/bin/sh\necho /config/xdg/config' > /etc/cont-env.d/XDG_CONFIG_HOME && chmod +x /etc/cont-env.d/XDG_CONFIG_HOME \
+    && printf '#!/bin/sh\necho /config/xdg/data' > /etc/cont-env.d/XDG_DATA_HOME && chmod +x /etc/cont-env.d/XDG_DATA_HOME \
+    && printf '#!/bin/sh\necho /tmp/run/user/app' > /etc/cont-env.d/XDG_RUNTIME_DIR && chmod +x /etc/cont-env.d/XDG_RUNTIME_DIR \
+    && printf '#!/bin/sh\necho /config/xdg/state' > /etc/cont-env.d/XDG_STATE_HOME && chmod +x /etc/cont-env.d/XDG_STATE_HOME
 
 # -----------------------------------------------------------------------------
 # Application Icon
@@ -130,6 +167,8 @@ EXPOSE 5800 5900
 # -----------------------------------------------------------------------------
 
 ENV HOME=/storage
+ENV LANG=zh_CN.UTF-8
+ENV LC_ALL=zh_CN.UTF-8
 
 # -----------------------------------------------------------------------------
 # Labels
