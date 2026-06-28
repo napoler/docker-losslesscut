@@ -1,7 +1,5 @@
 ---
-
 # This is an example compose file, adjust to your needs
-
 name: losslesscut
 
 services:
@@ -12,12 +10,12 @@ services:
     ports:
       - 5800:5800/tcp
     volumes:
-      # Configuration directory, beware of permissions
-      #- ./config:/config:rw
+      # Application configuration (persists across restarts)
+      - ./config:/config:rw
       # Video files will be looked for here
-      - ${HOME?}:/storage:rw
-      # Alternative path matching the host
-      - ${HOME}:${HOME}:rw
+      - ${HOME:-/home/user}:/storage:rw
+      # Mount /mnt so LosslessCut can access files outside $HOME
+      - /mnt:/mnt:rw
     environment:
       WEB_AUDIO: ${WEB_AUDIO:-1}
       DARK_MODE: ${DARK_MODE:-1}

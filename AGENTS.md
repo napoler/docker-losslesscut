@@ -1,7 +1,7 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-03-20
-**Commit:** 028b582
+**Generated:** 2026-06-29
+**Commit:** 90c4266
 **Branch:** master
 
 ## OVERVIEW
@@ -34,14 +34,16 @@ Docker wrapper for [LosslessCut](https://github.com/mifi/lossless-cut) — wraps
 ## CONVENTIONS
 
 **Build System:**
-- Multi-stage: `extract-stage` downloads binary → `final-stage` runtime
-- Base image: `jlesage/baseimage-gui:debian-12-v4`
+- Multi-stage: `download-stage` downloads binary → final-stage runtime
+- Base image: `jlesage/baseimage-gui:debian-12-v4.11.3`
 - Platform detection via `TARGETPLATFORM` (BuildKit) — **never set default**
-- Versioning: `app_version` (LosslessCut) + `image_revision` (container bump)
+- Versioning: `APP_VERSION` (LosslessCut) + `IMAGE_REVISION` (container bump)
+- Supported platforms: amd64, arm64 (arm/v7 dropped since LosslessCut 3.68.0)
 
 **Tagging:**
 - 7 tags per build: `:latest`, `:X.Y.Z`, `:X.Y`, `:X`, plus `-vN` revision suffixes
 - Dual registry: GHCR + Docker Hub
+- Platforms: amd64, arm64 (arm/v7 dropped since LosslessCut 3.68.0)
 
 **Makefile Patterns:**
 - `make build` — single platform

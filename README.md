@@ -56,7 +56,6 @@ docker run --rm -d \
 ### Docker Compose
 
 ```yaml
-version: '3'
 services:
   losslesscut:
     image: ghcr.io/napoler/losslesscut:latest
@@ -109,7 +108,6 @@ docker run -d --name handbrake \
 ### Docker Compose 联合部署
 
 ```yaml
-version: '3'
 services:
   losslesscut:
     image: ghcr.io/napoler/losslesscut:latest

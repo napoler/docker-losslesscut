@@ -1,7 +1,7 @@
 # This makefile is provided to simplify building multiplatform images since
 #  the command can get quite complex
 # Usage:
-# $ make        - Build for the current platform (only supports amd64, armv7 and arm64 on linux)
+# $ make        - Build for the current platform (only supports amd64 and arm64 on linux; armv7 dropped since LosslessCut 3.68.0)
 # $ make buildx - Build multiplatform images
 # $ make push   - Push multiplatform images to the registry
 
@@ -11,16 +11,15 @@ REGISTRY:=ghcr.io
 # Additional tags (passed verbatim to docker build), separated by spaces
 ADD_TAGS:=
 
-# Platform using docker naming scheme: amd64, arm/v7, arm64 (with "linux/" as prefix)
-#  derived from the uname
+# Platform using docker naming scheme: amd64, arm64 (with "linux/" as prefix)
+#  derived from the uname (arm/v7 no longer supported by LosslessCut >= 3.68.0)
 # See https://hub.docker.com/r/jlesage/baseimage-gui/tags
 platform:=$(shell test `uname -m` = 'x86_64' && echo 'amd64' ; \
-	 test `uname -m` = 'aarch64' && echo 'arm64' ; \
-	 test `uname -m` = 'armv7l' && echo 'arm/v7' ; \
-	 )
+		 test `uname -m` = 'aarch64' && echo 'arm64' ; \
+		 )
 
-APP_VERSION:=$(shell grep '^ARG app_version=' Dockerfile | awk '{print $$2}' | cut -d= -f2)
-IMAGE_REVISION:=$(shell grep '^ARG image_revision=' Dockerfile | awk '{print $$2}' | cut -d= -f2)
+APP_VERSION:=$(shell grep '^ARG APP_VERSION=' Dockerfile | awk '{print $$2}' | cut -d= -f2)
+IMAGE_REVISION:=$(shell grep '^ARG IMAGE_REVISION=' Dockerfile | awk '{print $$2}' | cut -d= -f2)
 
 REV_SUFFIX:=-v$(IMAGE_REVISION)
 
@@ -52,7 +51,7 @@ buildx-%:
 	docker buildx build \
 		$(subst noop,,$*) \
 		$(ALL_TAGS_PARAM) \
-	 	--platform=linux/amd64,linux/arm/v7,linux/arm64 .
+	 	--platform=linux/amd64,linux/arm64 .
 
 # Prints the list of tags to be used by build/push 
 print-tags:
