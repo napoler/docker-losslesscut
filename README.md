@@ -239,7 +239,7 @@ docker rm losslesscut
 
 ## Docker Compose File
 
-An example [`docker-compose.yaml`](./blob/docker-compose.yaml) file is provided for use with [Docker Compose](https://docs.docker.com/compose/overview/).
+An example [`docker-compose.yaml`](./docker-compose.yaml) file is provided for use with [Docker Compose](https://docs.docker.com/compose/overview/).
 
 Make sure to adjust according to your needs.  Note that only mandatory network ports are part of the example.
 

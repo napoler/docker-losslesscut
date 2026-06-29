@@ -12,7 +12,7 @@ Docker wrapper for [LosslessCut](https://github.com/mifi/lossless-cut) — wraps
 
 ```
 .
-├── Dockerfile              # Multi-stage build (extract → final)
+├── Dockerfile              # Multi-stage build (download → final)
 ├── GNUmakefile             # Build automation (make build/buildx/push)
 ├── docker-compose.yaml     # Example compose config
 ├── .github/workflows/      # CI (ci.yaml) + CD (build-and-deploy.yaml)
@@ -24,12 +24,12 @@ Docker wrapper for [LosslessCut](https://github.com/mifi/lossless-cut) — wraps
 | Task | Location |
 |------|----------|
 | Modify container build | `Dockerfile` |
-| Add/change dependencies | `Dockerfile` lines 45-126, use `helper-scripts/generate_dependencies_list.bash` |
+| Add/change dependencies | `Dockerfile` lines 61-100, use `helper-scripts/generate_dependencies_list.bash` |
 | Change build tags/registry | `GNUmakefile` lines 8-13 |
-| Modify CI triggers | `.github/workflows/ci.yaml` lines 9-18 |
+| Modify CI triggers | `.github/workflows/ci.yaml` lines 7-18 |
 | Modify CD deployment | `.github/workflows/build-and-deploy.yaml` |
-| Runtime env vars | `README.md` lines 93-115 |
-| Startup command | `Dockerfile` line 140: `/LosslessCut/losslesscut --no-sandbox` |
+| Runtime env vars | `README.md` lines 158-184 |
+| Startup command | `Dockerfile` line 127: `/LosslessCut/losslesscut --no-sandbox` |
 
 ## CONVENTIONS
 
@@ -47,14 +47,14 @@ Docker wrapper for [LosslessCut](https://github.com/mifi/lossless-cut) — wraps
 
 **Makefile Patterns:**
 - `make build` — single platform
-- `make buildx` — multi-platform (amd64, arm/v7, arm64)
+- `make buildx` — multi-platform (amd64, arm64)
 - `make push` — build + push to registries
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
 | Pattern | Why Forbidden |
 |---------|---------------|
-| Setting `TARGETPLATFORM` default | Breaks multi-arch builds (Dockerfile line 8-9) |
+| Setting `TARGETPLATFORM` default | Breaks multi-arch builds (Dockerfile line 24) |
 | Removing `--no-sandbox` | Electron sandbox fails in container |
 | VNC password >8 chars | RFC 6143 limitation, truncated silently |
 | Building without BuildKit | `TARGETPLATFORM` won't be set |
@@ -63,7 +63,7 @@ Docker wrapper for [LosslessCut](https://github.com/mifi/lossless-cut) — wraps
 
 - **No application code** — downloads pre-built LosslessCut binary
 - **Makefile for Docker** — unusual but simplifies complex `buildx` commands
-- **ARM ffmpeg workaround** — symlinks system ffmpeg if missing (Dockerfile lines 133-136)
+- **ARM ffmpeg workaround** — symlinks system ffmpeg if missing (Dockerfile lines 115-118)
 - **Dual registry deployment** — simultaneously pushes to GHCR + Docker Hub
 
 ## COMMANDS
@@ -93,4 +93,4 @@ docker exec -ti losslesscut sh
 - **Ports**: 5800 (web GUI), 5900 (VNC)
 - **Volumes**: `/config` (persistent state), `/storage` (host files)
 - **Base image docs**: https://github.com/jlesage/docker-baseimage-gui
-- **CI builds on push** (excluding docs); **CD deploys on semver tags**
+- **CI builds on push** (excluding docs and workflow files); **CD deploys on semver tags**

@@ -2,11 +2,15 @@
 # https://github.com/mifi/lossless-cut
 # Base image: https://github.com/jlesage/docker-baseimage-gui
 #
+# NOTE: For production builds, pin base images with SHA256 digests:
+#   docker buildx imagetools inspect alpine:3.20 --format '{{.Digest}}'
+#   docker buildx imagetools inspect jlesage/baseimage-gui:debian-12-v4.11.3 --format '{{.Digest}}'
+# Then replace the FROM lines with @sha256:<digest>
+#
 # 完全重构版本 - 2026-03-23
 # - 使用最新基础镜像 v4.11.3
 # - 简化构建流程
 # - 仅支持 amd64 和 arm64（LosslessCut 3.68.0 不再提供 armv7l）
-
 # =============================================================================
 # Build Arguments
 # =============================================================================
@@ -50,6 +54,7 @@ FROM jlesage/baseimage-gui:debian-12-v4.11.3
 
 ARG APP_VERSION
 ARG IMAGE_REVISION
+ARG TARGETPLATFORM
 
 # -----------------------------------------------------------------------------
 # Install Runtime Dependencies
@@ -138,7 +143,7 @@ RUN set -eux \
     && printf '#!/bin/sh\necho %s' "${APP_VERSION}" > /etc/cont-env.d/APP_VERSION && chmod +x /etc/cont-env.d/APP_VERSION \
     && printf '#!/bin/sh\necho %s' "${IMAGE_REVISION}" > /etc/cont-env.d/DOCKER_IMAGE_VERSION && chmod +x /etc/cont-env.d/DOCKER_IMAGE_VERSION \
     && printf '#!/bin/sh\necho unix:path=/tmp/dbus.base' > /etc/cont-env.d/DBUS_SESSION_BUS_ADDRESS && chmod +x /etc/cont-env.d/DBUS_SESSION_BUS_ADDRESS \
-    && printf '#!/bin/sh\necho linux/amd64' > /etc/cont-env.d/DOCKER_IMAGE_PLATFORM && chmod +x /etc/cont-env.d/DOCKER_IMAGE_PLATFORM \
+    && printf '#!/bin/sh\necho %s' "${TARGETPLATFORM}" > /etc/cont-env.d/DOCKER_IMAGE_PLATFORM && chmod +x /etc/cont-env.d/DOCKER_IMAGE_PLATFORM \
     && printf '#!/bin/sh\necho none' > /etc/cont-env.d/GTK_A11Y && chmod +x /etc/cont-env.d/GTK_A11Y \
     && printf '#!/bin/sh\necho' > /etc/cont-env.d/HOME && chmod +x /etc/cont-env.d/HOME \
     && printf '#!/bin/sh\necho 1' > /etc/cont-env.d/NO_AT_BRIDGE && chmod +x /etc/cont-env.d/NO_AT_BRIDGE \
@@ -165,6 +170,13 @@ EXPOSE 5800 5900
 # -----------------------------------------------------------------------------
 # Environment Variables
 # -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Healthcheck
+# -----------------------------------------------------------------------------
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:5800/ || exit 1
 
 ENV HOME=/storage
 ENV LANG=zh_CN.UTF-8

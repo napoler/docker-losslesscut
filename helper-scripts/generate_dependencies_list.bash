@@ -12,7 +12,7 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-ldd $1 \
+ldd "$1" \
     | grep -v libffmpeg.so \
     | awk '{print $3}' \
     | xargs realpath \

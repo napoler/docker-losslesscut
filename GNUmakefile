@@ -53,7 +53,7 @@ buildx-%:
 		$(ALL_TAGS_PARAM) \
 	 	--platform=linux/amd64,linux/arm64 .
 
-# Prints the list of tags to be used by build/push 
+# Prints the list of tags to be used by build/push
 print-tags:
 	@echo $(ALL_TAGS)
 

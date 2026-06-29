@@ -18,5 +18,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed docker-compose.yaml: added missing `/config` volume, removed redundant `$HOME` mount, safe fallback for `${HOME}`
 - Removed deprecated `version: '3'` from README.md compose examples
 - Removed stale FIXME and TODO comments from CI/CD workflows
-- Removed `.github/workflows/*` and `helper-scripts/*` from CI paths-ignore
+- Added .github/workflows/* to CI paths-ignore to prevent workflow file changes from triggering CI builds
 - Added `.editorconfig` for consistent coding styles
